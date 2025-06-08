@@ -1,0 +1,6 @@
+datasets 
+transformers 
+accelerate 
+fsspec 
+gcsfs
+evaluate
