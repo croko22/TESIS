@@ -4,3 +4,4 @@ accelerate
 fsspec 
 gcsfs
 evaluate
+sentencepiece
