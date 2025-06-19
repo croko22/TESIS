@@ -35,18 +35,21 @@ En esta fase se evaluaron distintas variantes para mejorar la alineación entre 
 
 ### Resultados
 
-| Métrica                   | Base (sin ajustes) | Versión con recuperación + plantillas |
-| BLEU-4                    | 0.21               | **0.37**                              |
-| ROUGE-L                   | 0.38               | **0.49**                              |
-| Coincidencia de intención | 61%                | **86%**                               |
+| Métrica                   | Base (sin ajustes) | Recuperación + Plantillas |
+|---------------------------|--------------------|----------------------------|
+| BLEU-4                    | 0.21               | 0.37                       |
+| ROUGE-L                   | 0.38               | 0.49                       |
+| Coincidencia de intención| 61%                | 86%                        |
+
 
 
 ### Comparación con variantes conocidas
 
-| Variante                   | BLEU-4 | ROUGE-L | Alineación con intención |
-| Generación directa         | 0.21   | 0.38    | 61%                      |
-| Versión con RAG            | 0.37   | 0.49    | 86%                      |
-| MixQG (referencia externa) | 0.43   | 0.50    | 90%                      |
+| Variante                  | BLEU-4 | ROUGE-L | Alineación con intención |
+|---------------------------|--------|---------|---------------------------|
+| Generación directa        | 0.21   | 0.38    | 61%                       |
+| Versión con RAG           | 0.37   | 0.49    | 86%                       |
+| MixQG (referencia externa)| 0.43   | 0.50    | 90%                       |
 
 A pesar de no entrenar sobre datasets masivos o aplicar métodos complejos de entrenamiento, los resultados muestran mejoras sostenidas al introducir señales contextuales adicionales.
 
