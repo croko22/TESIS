@@ -1,45 +1,42 @@
-import argparse
+
+
+from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
 import torch
-from model import load_trained_model
 
-def generate_question(context: str, intent: str, model, tokenizer):
-    """
-    Genera una pregunta usando el modelo fine-tuned.
-    """
-    input_text = f"generar pregunta para {intent}: {context}"
-    
-    device = "cuda" if torch.cuda.is_available() else "cpu"
-    model.to(device)
-    
-    inputs = tokenizer(input_text, return_tensors="pt", max_length=512, truncation=True).to(device)
-    
-    outputs = model.generate(
-        inputs.input_ids,
-        max_length=128,
-        num_beams=5,  # Usar beam search para generar mejores preguntas
-        early_stopping=True
-    )
-    
-    generated_question = tokenizer.decode(outputs[0], skip_special_tokens=True)
-    return generated_question
+class QuestionGenerator:
+    def __init__(self, model_path="./fine_tuned_qg_model"): 
+        self.tokenizer = AutoTokenizer.from_pretrained(model_path)
+        self.model = AutoModelForSeq2SeqLM.from_pretrained(model_path)
+        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        self.model.to(self.device)
 
-def main():
-    parser = argparse.ArgumentParser(description="Generar una pregunta con un modelo T5 entrenado.")
-    parser.add_argument("--model_path", type=str, required=True, help="Ruta al directorio del modelo entrenado.")
-    parser.add_argument("--context", type=str, required=True, help="El texto de contexto para generar la pregunta.")
-    parser.add_argument("--intent", type=str, required=True, help="El intento deseado (e.g., 'what', 'why', 'how').")
-    
-    args = parser.parse_args()
+    def generate_question(self, context_with_highlight):
+        inputs = self.tokenizer(
+            context_with_highlight,
+            return_tensors='pt',
+            padding=True,
+            truncation=True,
+            max_length=512
+        )
 
-    # Cargar modelo
-    model, tokenizer = load_trained_model(args.model_path)
+        outputs = self.model.generate(
+            inputs['input_ids'].to(self.device),
+            max_length=128,             
+            num_beams=8,                
+            no_repeat_ngram_size=3,     
+            length_penalty=0.7,         
+            early_stopping=True         
+        )
 
-    # Generar pregunta
-    question = generate_question(args.context, args.intent, model, tokenizer)
+        question = self.tokenizer.decode(outputs[0], skip_special_tokens=True)
+        return question
+
+
+if __name__ == "__main__":
     
-    print("\n" + "="*20)
-    print(f"Contexto: {args.context}")
-    print(f"Intento: {args.intent}")
-    print("-" * 20)
-    print(f"Pregunta Generada: {question}")
-    print("="*20)
+    q_gen = QuestionGenerator(model_path="./fine_tuned_qg_model") 
+    
+    example_context = "The capital of France is <h>Paris</h>."
+    generated_question = q_gen.generate_question(example_context)
+    print(f"Context: {example_context}")
+    print(f"Generated Question: {generated_question}")
